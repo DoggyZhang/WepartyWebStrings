@@ -224,7 +224,7 @@ public class ExcelUtil {
     }
 
     private static Map<String, List<MultiLanguageBean>> convertData(Map<String, List<MultiLanguageBean>> datas) {
-        Map<String, List<MultiLanguageBean>> convertData = new HashMap<>();
+        Map<String, List<MultiLanguageBean>> convertData = new LinkedHashMap<>();
         Iterator<String> keys = datas.keySet().iterator();
         while (keys.hasNext()) {
             final String language = keys.next();

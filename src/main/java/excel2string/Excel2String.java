@@ -108,7 +108,7 @@ public class Excel2String {
 
     private void replaceAndUpdateLocaleJson(File localeFile, List<ElementBean> newContent) {
         //读取旧的翻译
-        Map<String, String> contentMap = new HashMap<>();
+        LinkedHashMap<String, String> contentMap = new LinkedHashMap<>();
         if (localeFile.exists()) {
             String json = null;
             try {
@@ -116,7 +116,7 @@ public class Excel2String {
             } catch (IOException e) {
             }
             if (json != null && !json.isEmpty()) {
-                Map<String, String> old = gson.fromJson(json, new TypeToken<LinkedHashMap<String, String>>() {
+                LinkedHashMap<String, String> old = gson.fromJson(json, new TypeToken<LinkedHashMap<String, String>>() {
                 }.getType());
                 contentMap.putAll(old);
             }

@@ -83,7 +83,7 @@ public class String2Excel {
                 return;
             }
             //<语言, <key, value>>
-            Map<String, List<MultiLanguageBean>> languages = new HashMap<>();
+            LinkedHashMap<String, List<MultiLanguageBean>> languages = new LinkedHashMap<>();
             for (File jsonFile : jsonsFile) {
                 String name = jsonFile.getName();
                 String languageCode = name.substring(0, name.length() - 5);
