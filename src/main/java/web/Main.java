@@ -11,6 +11,7 @@ public class Main {
     private static final String NEW_WEB = "newWeb";
     private static final String PROJECT = "project";
     private static final String OUTPUT = "output";
+    private static final String EXCEL = "excel";
 
     public static void main(String[] args) {
         if (args == null || args.length == 0) {
@@ -36,7 +37,7 @@ public class Main {
             case "excel2string": {
                 new Excel2String(
                         argsMap.get(PROJECT),
-                        argsMap.get(OUTPUT),
+                        argsMap.get(EXCEL),
                         Boolean.parseBoolean(argsMap.get(NEW_WEB))
                 ).execute();
             }
@@ -66,15 +67,15 @@ public class Main {
         System.out.println("   输入以下内容");
         System.out.println("   mode=string2excel   string转excel模式");
         System.out.println("   newWeb=true|false   新/旧Web项目");
-        System.out.println("   project=[path]         [path]为项目根路径");
+        System.out.println("   project=[path]      [path]为项目根路径");
         System.out.println("   output=[output]     [output]为结果输出路径,为空则默认为path");
         System.out.println();
         System.out.println("2. Excel转String");
         System.out.println("   输入以下内容");
         System.out.println("   mode=excel2string   excel转string模式");
         System.out.println("   newWeb=true|false   新/旧Web项目");
-        System.out.println("   project=[path]         [path]为项目根路径");
-        System.out.println("   output=[output]     [output]为结果输出路径,为空则默认为path");
+        System.out.println("   excel=[excel]       [excel]Excel翻译内容路径");
+        System.out.println("   project=[path]      [path]为项目根路径");
         System.out.println();
     }
 }

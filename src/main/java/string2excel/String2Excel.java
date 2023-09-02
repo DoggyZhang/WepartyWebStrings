@@ -11,13 +11,14 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.stream.*;
 
+import static data.Constant.*;
+
 public class String2Excel {
 
-    private static Gson gson = new Gson();
-    private String projectPath;
+    private final Gson gson = new Gson();
+    private final String projectPath;
     private String outputPath;
-
-    private boolean isNewWeb;
+    private final boolean isNewWeb;
 
     public String2Excel(String path, String output, boolean isNewWeb) {
         this.projectPath = path;
@@ -52,18 +53,21 @@ public class String2Excel {
         } catch (IOException e) {
         }
 
-        Map<File, File> stringPath = new HashMap<>();
+        Map<File, File> localePathMap = new HashMap<>();
         if (isNewWeb) {
             //新Web项目
-            stringPath.putAll(WenextWebMono.findStringPath(project));
+            localePathMap.putAll(WenextWebMono.findStringPath(project));
         } else {
             //旧Web项目
-            stringPath.putAll(WepartyWeb.findStringPath(project));
+            localePathMap.putAll(WepartyWeb.findStringPath(project));
         }
-        string2Excel(stringPath, outputDir);
+        //导出Excel
+        string2Excel(localePathMap, outputDir);
+        //记录模块->locale的映射
+        saveExcel2Locale(localePathMap, outputPath);
     }
 
-    public static void string2Excel(Map<File, File> stringPath, File output) {
+    private void string2Excel(Map<File, File> stringPath, File output) {
         if (stringPath.isEmpty()) {
             System.out.println("没有内容需要转化的");
             return;
@@ -111,14 +115,13 @@ public class String2Excel {
                 languages.put(languageCode, languageBeans);
             }
 
-            File outputFile = new File(output.getAbsoluteFile() + File.separator + modelDir.getName() + ".xls");
+            File outputFile = new File(output.getAbsoluteFile() + File.separator + getXlsName(modelDir.getName()));
             if (outputFile.exists()) {
                 outputFile.delete();
             }
             try {
                 outputFile.createNewFile();
             } catch (IOException e) {
-                throw new RuntimeException(e);
             }
             ExcelUtil.generateExcelFile(outputFile, languages);
 
@@ -130,7 +133,11 @@ public class String2Excel {
         saveChineseInfo(chineseCountList, output.getAbsolutePath());
     }
 
-    private static CharCountData collectChineseInfo(String modelName, Map<String, List<MultiLanguageBean>> languages) {
+    private String getXlsName(String modelName) {
+        return modelName + ".xls";
+    }
+
+    private CharCountData collectChineseInfo(String modelName, Map<String, List<MultiLanguageBean>> languages) {
         if (languages == null || languages.isEmpty()) {
             return new CharCountData(modelName, 0);
         }
@@ -149,7 +156,7 @@ public class String2Excel {
     /**
      * 计算中文字数(不包含标点符号)
      */
-    private static int chineseCount(String content) {
+    private int chineseCount(String content) {
         if (content == null || content.length() == 0) {
             return 0;
         }
@@ -174,7 +181,7 @@ public class String2Excel {
         return count;
     }
 
-    private static void saveChineseInfo(List<CharCountData> lines, String saveFileDir) {
+    private void saveChineseInfo(List<CharCountData> lines, String saveFileDir) {
         if (lines == null || lines.isEmpty()) {
             return;
         }
@@ -191,6 +198,33 @@ public class String2Excel {
                 output.createNewFile();
             }
             org.apache.commons.io.FileUtils.writeLines(output, strLines);
+        } catch (IOException e) {
+        }
+    }
+
+    private void saveExcel2Locale(Map<File, File> localePathMap, String saveFileDir) {
+        if (localePathMap == null || localePathMap.isEmpty()) {
+            return;
+        }
+        Map<String, String> localePath = new HashMap<>();
+        localePathMap.forEach((modelDir, localeDir) -> {
+            localePath.put(
+                    getXlsName(modelDir.getName()),
+                    localeDir.getAbsolutePath()
+            );
+        });
+        String json = gson.toJson(localePath);
+        File output = new File(saveFileDir, MEDAL_2_LOCALE_FILE);
+        try {
+            FileUtils.forceDelete(output);
+        } catch (IOException e) {
+        }
+        //输出统计结果
+        try {
+            if (!output.exists()) {
+                output.createNewFile();
+            }
+            FileUtils.write(output, json, StandardCharsets.UTF_8);
         } catch (IOException e) {
         }
     }
