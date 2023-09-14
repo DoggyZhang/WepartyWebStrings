@@ -50,6 +50,9 @@ public class WenextWebMono {
         if (path == null || !path.exists()) {
             return null;
         }
+        if (path.getAbsolutePath().contains("node_modules")) {
+            return null;
+        }
         if (path.isDirectory() && path.getName().equals("locale")) {
             return path;
         }
